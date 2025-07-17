@@ -2,28 +2,36 @@ from flask import Flask, request, jsonify
 import joblib
 import numpy as np
 
-# Carga el modelo
+# Cargar modelo entrenado
 modelo = joblib.load('modelo_rf_p_lab.pkl')
 
+# Crear instancia de Flask
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "🌱 API de Predicción de Fósforo con Random Forest"
+@app.route('/', methods=['GET'])
+def predecir_con_get():
+    try:
+        # Obtener parámetros desde la URL (query string)
+        N = float(request.args.get('N_sensor'))
+        P = float(request.args.get('P_sensor'))
+        K = float(request.args.get('K_sensor'))
+        CE = float(request.args.get('CE_lab'))
 
-@app.route('/predecir', methods=['POST'])
-def predecir():
-    data = request.get_json()
-    # Extraer datos en el mismo orden del entrenamiento
-    entrada = np.array([
-        data['N_sensor'],
-        data['P_sensor'],
-        data['K_sensor'],
-        data['CE_lab']
-    ]).reshape(1, -1)
+        # Organizar entrada en el orden exacto del entrenamiento
+        entrada = np.array([[N, P, K, CE]])
+        prediccion = modelo.predict(entrada)[0]
 
-    prediccion = modelo.predict(entrada)[0]
-    return jsonify({'P_lab_predicho': round(prediccion, 2)})
+        return jsonify({
+            'P_lab_predicho': round(prediccion, 2),
+            'entrada': {
+                'N_sensor': N,
+                'P_sensor': P,
+                'K_sensor': K,
+                'CE_lab': CE
+            }
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
