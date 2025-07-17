@@ -2,21 +2,28 @@ from flask import Flask, request, jsonify
 import joblib
 import numpy as np
 
+# Carga el modelo
+modelo = joblib.load('modelo_rf_p_lab.pkl')
+
 app = Flask(__name__)
 
-# Cargar el modelo
-modelo = joblib.load("modelo_rf_p_lab.pkl")
-
 @app.route('/')
-def index():
-    return "API del modelo Random Forest en Flask."
+def home():
+    return "🌱 API de Predicción de Fósforo con Random Forest"
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    datos = request.get_json()
-    entrada = np.array(datos['data']).reshape(1, -1)
-    prediccion = modelo.predict(entrada)
-    return jsonify({'prediccion': int(prediccion[0])})
+@app.route('/predecir', methods=['POST'])
+def predecir():
+    data = request.get_json()
+    # Extraer datos en el mismo orden del entrenamiento
+    entrada = np.array([
+        data['N_sensor'],
+        data['P_sensor'],
+        data['K_sensor'],
+        data['CE_lab']
+    ]).reshape(1, -1)
+
+    prediccion = modelo.predict(entrada)[0]
+    return jsonify({'P_lab_predicho': round(prediccion, 2)})
 
 if __name__ == '__main__':
     app.run(debug=True)
