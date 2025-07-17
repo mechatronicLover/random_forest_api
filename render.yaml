@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: random-forest-api
+    env: python
+    region: oregon  # puedes cambiarlo a frankfurt si prefieres Europa
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    runtime: python
+    autoDeploy: true
