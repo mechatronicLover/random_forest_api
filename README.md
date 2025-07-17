@@ -21,7 +21,7 @@ random_forest_api/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu_usuario/random_forest_api.git
+git clone https://github.com/mechatronicLover/random_forest_api.git
 cd random_forest_api
 ```
 
