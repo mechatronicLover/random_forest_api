@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+from flask_cors import CORS
 
+app = Flask(__name__)
+CORS(app)  # Esto habilitará CORS para todas las rutas
 # Cargar modelo entrenado
 modelo = joblib.load('modelo_rf_p_lab.pkl')
 
