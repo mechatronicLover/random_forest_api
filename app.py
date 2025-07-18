@@ -1,13 +1,17 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+import pandas as pd
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  #CORS para todas las rutas
+CORS(app)  # Habilitar CORS en todas las rutas
 
 # Cargar modelo entrenado
 modelo = joblib.load('modelo_rf_p_lab.pkl')
+
+# Nombres de las columnas usadas en el entrenamiento
+columnas = ['N_sensor', 'P_sensor', 'K_sensor', 'CE_lab']
 
 @app.route('/', methods=['GET'])
 def predecir_con_get():
@@ -18,9 +22,11 @@ def predecir_con_get():
         K = float(request.args.get('K_sensor'))
         CE = float(request.args.get('CE_lab'))
 
-        # Organizar entrada en el orden exacto del entrenamiento
-        entrada = np.array([[N, P, K, CE]])
-        prediccion = modelo.predict(entrada)[0]
+        # Crear un DataFrame con nombres de columnas
+        entrada_df = pd.DataFrame([[N, P, K, CE]], columns=columnas)
+
+        # Realizar la predicción
+        prediccion = modelo.predict(entrada_df)[0]
 
         return jsonify({
             'P_lab_predicho': round(prediccion, 2),
@@ -31,6 +37,7 @@ def predecir_con_get():
                 'CE_lab': CE
             }
         })
+
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
