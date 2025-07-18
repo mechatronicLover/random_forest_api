@@ -4,12 +4,10 @@ import numpy as np
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Esto habilitará CORS para todas las rutas
+CORS(app)  #CORS para todas las rutas
+
 # Cargar modelo entrenado
 modelo = joblib.load('modelo_rf_p_lab.pkl')
-
-# Crear instancia de Flask
-app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def predecir_con_get():
